@@ -3,9 +3,11 @@ import Data.Array
 
 main = do
   fileContents <- readFile "board.txt"
+  putStrLn "Enter the number of evolutions:"
+  numIterations <- getLine
   let 
     startBoard = boardFromString fileContents
-    evolutions = take 72 (iterate (evolve) startBoard)
+    evolutions = take (read numIterations) (iterate (evolve) startBoard)
   mapM_ printGrid evolutions
   
 boardFromString :: String -> Array(Int, Int) Int
