@@ -22,3 +22,8 @@ Biggest frustrations / learning curves:
     * You can represent multi-dimensional arrays with tuples for indexes
   * Although I'm new to Haskell, using arrays didn't feel very idiomatic. While walking and riding around the city, I've been wondering whether something like an adjancency list would allow for a more elegant approach in Haskell. However, cyclic references [seem a little knotty](https://wiki.haskell.org/Tying_the_Knot) in Haskell.
     
+Useful tools and references:
+* [zvon.org](http://zvon.org/comp/r/ref-Haskell.html#intro) — particularly for the simple usage examples [like here](http://zvon.org/other/haskell/Outputarray/index.html)
+* [Learn You a Haskell for Great Good](http://learnyouahaskell.com/chapters) — seems to be a well regarded, frequently referenced Haskell guide.
+* [Haskell Wikibook](https://en.wikibooks.org/wiki/Haskell) — thorough reference-style book
+* Stack Overflow — because most of the questions anyone will have have already been answered. However, I do note that there were not as many questions and answers on working with arrays in Haskell as I had hoped.
