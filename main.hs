@@ -31,14 +31,20 @@ evolve board = listArray (bounds board) boardValues
     boardValues = map evolveCell cellsAndNeighbors
 
 evolveCell :: (Cell, [Cell]) -> Cell
-evolveCell (Alive, cells)
-  | (countLiving cells) == 2 = Alive
-  | (countLiving cells) == 3 = Alive
+evolveCell (Alive, neighbors)
+  | (countLiving neighbors) == 2 = Alive
+  | (countLiving neighbors) == 3 = Alive
   | otherwise                = Dead
 
-evolveCell (Dead, cells)
-  | (countLiving cells) == 3 = Alive
+evolveCell (Dead, neighbors)
+  | (countLiving neighbors) == 3 = Alive
   | otherwise                = Dead
+
+countLiving = length . (filter isAlive)
+
+isAlive :: Cell -> Bool
+isAlive Alive = True
+isAlive Dead = False
 
 neighborsInBounds :: Boundary -> Coordinate -> [Coordinate]
 neighborsInBounds boardBounds coord = filter (isWithinBounds boardBounds) (allNeighbors coord)
@@ -57,13 +63,6 @@ allNeighbors (x, y) = [
 
 count :: Eq a => a -> [a] -> Int
 count x = length . filter (==x)
-
-countLiving :: [Cell] -> Int
-countLiving cells = length (filter isAlive cells)
-
-isAlive :: Cell -> Bool
-isAlive Alive = True
-isAlive Dead = False
   
 digitToCell :: Char -> Cell
 digitToCell '1' = Alive
