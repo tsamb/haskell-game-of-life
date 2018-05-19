@@ -30,14 +30,10 @@ digitToCell _   = Dead -- TODO: Handle this exception?
 evolve :: Board -> Board
 evolve board = listArray (bounds board) boardValues
   where
-    -- Returns a list of neighbor coords for each coord in the board.
-    boardCoordinates = indices board
-    neighborCoords = map ((intersect boardCoordinates) . allNeighbors) boardCoordinates
-    -- Transform each coordinate above into a cell.
-    boardWithNeighbors = map (map (board !)) neighborCoords
-    -- Zipping the two together.
-    cellsAndNeighbors = zip (elems board) boardWithNeighbors
-    boardValues = map evolveCell cellsAndNeighbors
+    boardCoordinates   = indices board
+    boardWithNeighbors = map ((map (board !)) . (intersect boardCoordinates) . neighbors) boardCoordinates
+    cellsAndNeighbors  = zip (elems board) boardWithNeighbors
+    boardValues        = map evolveCell cellsAndNeighbors
 
 evolveCell :: (Cell, [Cell]) -> Cell
 evolveCell (Alive, neighbors)
@@ -55,8 +51,8 @@ isAlive :: Cell -> Bool
 isAlive Alive = True
 isAlive Dead = False
 
-allNeighbors :: Coordinate -> [Coordinate]
-allNeighbors (x, y) = [
+neighbors :: Coordinate -> [Coordinate]
+neighbors (x, y) = [
 
   (x-1,y-1), (x,y-1), (x+1,y-1),
   (x-1,y  ),          (x+1,y),
