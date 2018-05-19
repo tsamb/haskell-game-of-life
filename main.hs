@@ -1,3 +1,4 @@
+import Data.List (intersect)
 import Data.Array
 
 type Coordinate = (Int, Int)
@@ -29,10 +30,11 @@ digitToCell _   = Dead -- TODO: Handle this exception?
 evolve :: Board -> Board
 evolve board = listArray (bounds board) boardValues
   where
-    -- Returns a list of lists of coordinates for each index in the array.
-    boardWithNeighborCoords = map (neighborsInBounds (bounds board)) (indices board)
+    -- Returns a list of neighbor coords for each coord in the board.
+    boardCoordinates = indices board
+    neighborCoords = map ((intersect boardCoordinates) . allNeighbors) boardCoordinates
     -- Transform each coordinate above into a cell.
-    boardWithNeighbors = map (map (board !)) boardWithNeighborCoords
+    boardWithNeighbors = map (map (board !)) neighborCoords
     -- Zipping the two together.
     cellsAndNeighbors = zip (elems board) boardWithNeighbors
     boardValues = map evolveCell cellsAndNeighbors
@@ -52,13 +54,6 @@ countLiving = length . (filter isAlive)
 isAlive :: Cell -> Bool
 isAlive Alive = True
 isAlive Dead = False
-
-neighborsInBounds :: Boundary -> Coordinate -> [Coordinate]
-neighborsInBounds boardBounds coord = filter (isWithinBounds boardBounds) (allNeighbors coord)
-
-isWithinBounds :: Boundary -> Coordinate -> Bool
-isWithinBounds ((xLowerBound, yLowerBound), (xUpperBound, yUpperBound)) (x,y) =
-  x >= xLowerBound && y >= yLowerBound && x <= xUpperBound && y <= yUpperBound
 
 allNeighbors :: Coordinate -> [Coordinate]
 allNeighbors (x, y) = [
