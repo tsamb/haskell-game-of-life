@@ -1,4 +1,3 @@
-import Data.Char (digitToInt)
 import Data.Array
 
 type Coordinate = (Int, Int)
