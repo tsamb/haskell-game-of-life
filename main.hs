@@ -17,6 +17,14 @@ inputStringToBoardBounds inputString = ((0, 0), (xBoundary, yBoundary))
   where
     xBoundary = (count '\n' inputString) - 1
     yBoundary = (length $ takeWhile (/= '\n') inputString) - 1
+  
+inputStringToCells :: [Char] -> [Cell]
+inputStringToCells inputString = [digitToCell x | x <- inputString, x /= '\n']
+
+digitToCell :: Char -> Cell
+digitToCell '1' = Alive
+digitToCell '0' = Dead
+digitToCell _   = Dead -- TODO: Handle this exception?
 
 evolve :: Board -> Board
 evolve board = listArray (bounds board) boardValues
@@ -62,14 +70,6 @@ allNeighbors (x, y) = [
 
 count :: Eq a => a -> [a] -> Int
 count x = length . filter (==x)
-  
-digitToCell :: Char -> Cell
-digitToCell '1' = Alive
-digitToCell '0' = Dead
-digitToCell _   = Dead -- TODO: Handle this exception?
-
-inputStringToCells :: [Char] -> [Cell]
-inputStringToCells inputString = [digitToCell x | x <- inputString, x /= '\n']
 
 -- START CITATION: https://markhneedham.com/blog/2012/04/03/haskell-print-friendly-representation-of-an-array/
 
