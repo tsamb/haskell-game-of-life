@@ -41,11 +41,11 @@ evolveCell :: (Cell, [Cell]) -> Cell
 evolveCell (Alive, neighbors)
   | (countLiving neighbors) == 2 = Alive
   | (countLiving neighbors) == 3 = Alive
-  | otherwise                = Dead
+  | otherwise                    = Dead
 
 evolveCell (Dead, neighbors)
   | (countLiving neighbors) == 3 = Alive
-  | otherwise                = Dead
+  | otherwise                    = Dead
 
 countLiving = length . (filter isAlive)
 
