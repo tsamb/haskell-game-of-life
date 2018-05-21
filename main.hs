@@ -1,54 +1,66 @@
-import Data.Char (digitToInt)
+import Data.List (intersect)
 import Data.Array
 
-main = do
-  fileContents <- readFile "board.txt"
-  putStrLn "Enter the number of evolutions:"
-  numIterations <- getLine
-  let 
-    startBoard = boardFromString fileContents
-    evolutions = take (read numIterations) (iterate (evolve) startBoard)
-  mapM_ printGrid evolutions
-  
-boardFromString :: String -> Array(Int, Int) Int
-boardFromString input = listArray ((0,0),((xSize-1),(ySize-1))) boardDigits
-  where
-    boardDigits = stripNewLines input
-    ySize = length (takeWhile ('\n'/=) input)
-    xSize = count '\n' input
+type Coordinate = (Int, Int)
+type Boundary   = (Coordinate, Coordinate)
+type Board      = Array Coordinate Cell
+data Cell       = Alive | Dead
 
-evolve :: Array (Int, Int) Int -> Array (Int, Int) Int
+instance Show Cell where
+  show Alive = "#"
+  show Dead  = "."
+
+boardFromString :: String -> Board
+boardFromString input = listArray (inputStringToBoardBounds input) (inputStringToCells input)
+
+inputStringToBoardBounds :: String -> Boundary
+inputStringToBoardBounds inputString = ((0, 0), (xBoundary, yBoundary))
+  where
+    xBoundary = (count '\n' inputString) - 1
+    yBoundary = (length $ takeWhile (/= '\n') inputString) - 1
+  
+inputStringToCells :: [Char] -> [Cell]
+inputStringToCells inputString = [digitToCell x | x <- inputString, x /= '\n']
+
+digitToCell :: Char -> Cell
+digitToCell '1' = Alive
+digitToCell '0' = Dead
+digitToCell _   = Dead -- TODO: Handle this exception?
+
+evolve :: Board -> Board
 evolve board = listArray (bounds board) boardValues
   where
-    boardWithNeighborCoords = map (neighborsInBounds (bounds board)) (indices board)
-    boardWithNeighbors = map (map (board !))  boardWithNeighborCoords
-    boardWithNeighborCounts = map (count 1) boardWithNeighbors
-    cellsAndNeighbors = zip (elems board) boardWithNeighborCounts
-    boardValues = map isAliveInNextGen cellsAndNeighbors
+    boardCoordinates   = indices board
+    boardWithNeighbors = map ((map (board !)) . (intersect boardCoordinates) . neighbors) boardCoordinates
+    cellsAndNeighbors  = zip (elems board) boardWithNeighbors
+    boardValues        = map evolveCell cellsAndNeighbors
 
-isAliveInNextGen :: (Int, Int) -> Int
-isAliveInNextGen (1,0) = 0
-isAliveInNextGen (1,1) = 0
-isAliveInNextGen (1,2) = 1
-isAliveInNextGen (1,3) = 1
-isAliveInNextGen (0,3) = 1
-isAliveInNextGen _ = 0 
+evolveCell :: (Cell, [Cell]) -> Cell
+evolveCell (Alive, neighbors)
+  | (countLiving neighbors) == 2 = Alive
+  | (countLiving neighbors) == 3 = Alive
+  | otherwise                    = Dead
 
-neighborsInBounds :: ((Int,Int),(Int,Int)) -> (Int, Int) -> [(Int, Int)]
-neighborsInBounds ((xLowerBound, yLowerBound), (xUpperBound, yUpperBound)) (x,y) =
-  filter (\coords -> fst coords >= xLowerBound && snd coords >= yLowerBound && fst coords <= xUpperBound && snd coords <= yUpperBound) allNeighbors
-  where allNeighbors = [(x-1,y-1),(x,y-1),(x+1,y-1),(x+1,y),(x+1,y+1),(x,y+1),(x-1,y+1),(x-1,y)]
+evolveCell (Dead, neighbors)
+  | (countLiving neighbors) == 3 = Alive
+  | otherwise                    = Dead
+
+countLiving = length . (filter isAlive)
+
+isAlive :: Cell -> Bool
+isAlive Alive = True
+isAlive Dead = False
+
+neighbors :: Coordinate -> [Coordinate]
+neighbors (x, y) = [
+
+  (x-1,y-1), (x,y-1), (x+1,y-1),
+  (x-1,y  ),          (x+1,y),
+  (x-1,y+1), (x,y+1), (x+1,y+1)]
+  
 
 count :: Eq a => a -> [a] -> Int
 count x = length . filter (==x)
-  
-stripNewLines :: [Char] -> [Int]  
-stripNewLines multiLineString = [digitToInt x | x <- multiLineString, x /= '\n']
-
-splitEvery _ [] = []
-splitEvery n list = first : (splitEvery n rest)
-  where
-    (first,rest) = splitAt n list
 
 -- START CITATION: https://markhneedham.com/blog/2012/04/03/haskell-print-friendly-representation-of-an-array/
 
@@ -63,3 +75,12 @@ textRepresentation :: Show a => [a] -> String
 textRepresentation row = foldl (\acc y -> acc ++ (show y) ++ " ") "" row
 
 -- END CITATION
+
+main = do
+  fileContents <- readFile "board.txt"
+  putStrLn "Enter the number of evolutions:"
+  numIterations <- getLine
+  let 
+    startBoard = boardFromString fileContents
+    evolutions = take (read numIterations) (iterate (evolve) startBoard)
+  mapM_ printGrid evolutions
