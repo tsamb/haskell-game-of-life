@@ -7,7 +7,7 @@ type Board      = Array Coordinate Cell
 data Cell       = Alive | Dead
 
 instance Show Cell where
-  show Alive = "#"
+  show Alive = "*"
   show Dead  = "."
 
 boardFromString :: String -> Board
@@ -20,12 +20,12 @@ inputStringToBoardBounds inputString = ((0, 0), (xBoundary, yBoundary))
     yBoundary = (length $ takeWhile (/= '\n') inputString) - 1
   
 inputStringToCells :: [Char] -> [Cell]
-inputStringToCells inputString = [digitToCell x | x <- inputString, x /= '\n']
+inputStringToCells inputString = [charToCell x | x <- inputString, x /= '\n']
 
-digitToCell :: Char -> Cell
-digitToCell '1' = Alive
-digitToCell '0' = Dead
-digitToCell _   = Dead -- TODO: Handle this exception?
+charToCell :: Char -> Cell
+charToCell '*' = Alive
+charToCell '.' = Dead
+charToCell _   = Dead -- TODO: Handle this exception?
 
 evolve :: Board -> Board
 evolve board = listArray (bounds board) boardValues
