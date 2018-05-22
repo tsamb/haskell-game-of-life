@@ -1,3 +1,4 @@
+module Game where
 import Data.List (intersect)
 import Data.Array
 
@@ -88,12 +89,3 @@ textRepresentation :: Show a => [a] -> String
 textRepresentation row = foldl (\acc y -> acc ++ (show y) ++ " ") "" row
 
 -- END CITATION
-
-main = do
-  fileContents <- readFile "board.txt"
-  putStrLn "Enter the number of evolutions:"
-  numIterations <- getLine
-  let 
-    startBoard = boardFromString fileContents
-    evolutions = take (read numIterations) (iterate (evolve) startBoard)
-  mapM_ printGrid evolutions
