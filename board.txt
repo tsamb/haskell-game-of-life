@@ -1,3 +1,9 @@
+! R Pentomino
+! as described here:
+! http://www.conwaylife.com/w/index.php?title=R-pentomino
+!
+! Stabilizes after 1103 generations
+!
 ................
 ................
 ................
