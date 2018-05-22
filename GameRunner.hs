@@ -1,4 +1,6 @@
 import Game
+import InputParser
+import GameView
 
 main = do
   fileContents <- readFile "board.txt"
@@ -8,4 +10,3 @@ main = do
     startBoard = boardFromString fileContents
     evolutions = take (read numIterations) (iterate (evolve) startBoard)
   mapM_ printGrid evolutions
-  
