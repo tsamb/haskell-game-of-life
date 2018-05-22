@@ -38,7 +38,7 @@ boardRowsToCells boardRows = [charToCell x | x <- concat boardRows]
 charToCell :: Char -> Cell
 charToCell '*' = Alive
 charToCell '.' = Dead
-charToCell _   = Dead -- TODO: Handle this exception?
+charToCell _   = error "Only periods, asterisks and comments are valid input"
 
 evolve :: Board -> Board
 evolve board = listArray (bounds board) boardValues
